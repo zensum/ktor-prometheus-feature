@@ -1,0 +1,109 @@
+apply plugin: 'kotlin'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'idea'
+
+group = 'se.zensum'
+version = '1.0-SNAPSHOT'
+description = 'description of project'
+
+defaultTasks 'run'
+
+buildscript {
+    ext.kotlin_version = '1.1.3-2'
+    ext.jvm_version = '1.8'
+    ext.junit_platform_version = '1.0.0-M4'
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.junit.platform:junit-platform-gradle-plugin:$junit_platform_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.0'
+    }
+}
+
+apply plugin: "org.junit.platform.gradle.plugin"
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-jdk8', version: '0.17'
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.17'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0-M4'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0-M4'
+}
+
+junitPlatform {
+    platformVersion = junit_platform_version
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': "se.zensum.KotlinMainClassKt"
+    }
+}
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    version = null
+}
+
+repositories {
+    jcenter()
+    maven { url "https://dl.bintray.com/kotlin/kotlinx" }
+    maven { url "https://dl.bintray.com/kotlin/ktor" }
+    maven {
+        url "https://jitpack.io"
+        credentials { username System.getenv("JITPACK_TOKEN") }
+    }
+}
+
+compileKotlin {
+    sourceCompatibility = jvm_version
+    kotlinOptions {
+        jvmTarget = jvm_version
+    }
+}
+
+compileJava {
+    sourceCompatibility = jvm_version
+    targetCompatibility = jvm_version
+    options.incremental = true
+    options.encoding = 'UTF-8'
+}
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+}
+
+// Important: All classes containing test cases must match the
+// the regex pattern "^.*Tests?$" to be picked up by the junit-gradle plugin.
+sourceSets {
+    main.resources.srcDirs += 'src/main/resources'
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    test.kotlin.srcDirs += 'src/test/kotlin'
+    main.java.srcDirs += 'src/main/java'
+    test.java.srcDirs += 'src/test/java'
+}
+
+task run(type: JavaExec) {
+    main = 'se.zensum.KotlinMainClassKt' //Important that 'Kt' is appended to class name
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task debug(type: JavaExec) {
+    debug true
+    environment "DEBUG", "true"
+    main = project.tasks.run.main
+    classpath = project.tasks.run.classpath
+}
+
+task wrapper(type: Wrapper) {
+    description = 'Generates gradlew[.bat] scripts for faster execution'
+    gradleVersion = '4.0'
+}

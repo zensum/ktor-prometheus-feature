@@ -1,0 +1,15 @@
+# JVM bytecode
+*.class
+
+# Gradle
+.gradle
+gradle
+gradlew*
+build
+
+# Intellij
+.idea
+*.iml
+
+# Environment variables for Docker
+.env
