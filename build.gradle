@@ -7,7 +7,7 @@ group = 'se.zensum'
 version = '1.0-SNAPSHOT'
 description = 'description of project'
 
-defaultTasks 'run'
+defaultTasks 'build'
 
 buildscript {
     ext.kotlin_version = '1.1.3-2'
@@ -25,7 +25,6 @@ buildscript {
 }
 
 apply plugin: "org.junit.platform.gradle.plugin"
-apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -39,26 +38,21 @@ junitPlatform {
     platformVersion = junit_platform_version
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': "se.zensum.KotlinMainClassKt"
-    }
-}
-
-shadowJar {
-    baseName = 'shadow'
-    classifier = null
-    version = null
-}
-
 repositories {
     jcenter()
     maven { url "https://dl.bintray.com/kotlin/kotlinx" }
     maven { url "https://dl.bintray.com/kotlin/ktor" }
-    maven {
-        url "https://jitpack.io"
-        credentials { username System.getenv("JITPACK_TOKEN") }
-    }
+}
+
+dependencies {
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jre8', version: '$kotlin_version'
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-jdk8', version: '0.14'
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.14'
+    compile group: 'org.jetbrains.ktor', name: 'ktor-core', version: '0.3.2'
+    compile group: 'org.jetbrains.ktor', name: 'ktor-netty', version: '0.3.2'
+    compile 'io.prometheus:simpleclient:0.0.23'
+    compile 'io.prometheus:simpleclient_hotspot:0.0.23'
+    compile 'io.prometheus:simpleclient_common:0.0.23'
 }
 
 compileKotlin {
@@ -89,18 +83,6 @@ sourceSets {
     test.kotlin.srcDirs += 'src/test/kotlin'
     main.java.srcDirs += 'src/main/java'
     test.java.srcDirs += 'src/test/java'
-}
-
-task run(type: JavaExec) {
-    main = 'se.zensum.KotlinMainClassKt' //Important that 'Kt' is appended to class name
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task debug(type: JavaExec) {
-    debug true
-    environment "DEBUG", "true"
-    main = project.tasks.run.main
-    classpath = project.tasks.run.classpath
 }
 
 task wrapper(type: Wrapper) {
