@@ -46,8 +46,6 @@ repositories {
 
 dependencies {
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jre8', version: '$kotlin_version'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-jdk8', version: '0.14'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.14'
     compile group: 'org.jetbrains.ktor', name: 'ktor-core', version: '0.3.2'
     compile group: 'org.jetbrains.ktor', name: 'ktor-netty', version: '0.3.2'
     compile 'io.prometheus:simpleclient:0.0.23'
@@ -78,11 +76,7 @@ kotlin {
 // Important: All classes containing test cases must match the
 // the regex pattern "^.*Tests?$" to be picked up by the junit-gradle plugin.
 sourceSets {
-    main.resources.srcDirs += 'src/main/resources'
     main.kotlin.srcDirs += 'src/main/kotlin'
-    test.kotlin.srcDirs += 'src/test/kotlin'
-    main.java.srcDirs += 'src/main/java'
-    test.java.srcDirs += 'src/test/java'
 }
 
 task wrapper(type: Wrapper) {
