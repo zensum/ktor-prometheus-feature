@@ -34,7 +34,7 @@ class PrometheusFeature(configuration: Configuration) {
             if(timer != null){  summary!!.observe(timer.observeDuration()) }
             if(counter != null) {
                 val method = context.call.request.httpMethod.value
-                val responseCode = context.call.response.status()!!.value.toString()
+                val responseCode = if(context.call.response.status() != null) context.call.response.status()!!.value.toString() else "404"
                 counter.labels(method, responseCode).inc()
             }
         }
