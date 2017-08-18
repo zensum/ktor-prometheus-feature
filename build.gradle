@@ -46,8 +46,7 @@ repositories {
 
 dependencies {
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jre8', version: '$kotlin_version'
-    compile group: 'org.jetbrains.ktor', name: 'ktor-core', version: '0.3.2'
-    compile group: 'org.jetbrains.ktor', name: 'ktor-netty', version: '0.3.2'
+    compile group: 'org.jetbrains.ktor', name: 'ktor-core', version: '0.4.0'
     compile 'io.prometheus:simpleclient:0.0.23'
     compile 'io.prometheus:simpleclient_hotspot:0.0.23'
     compile 'io.prometheus:simpleclient_common:0.0.23'
