@@ -2,10 +2,8 @@ package se.zensum.ktorPrometheusFeature
 
 import io.prometheus.client.Counter
 import io.prometheus.client.Summary
-import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.application.ApplicationCallPipeline
 import org.jetbrains.ktor.application.ApplicationFeature
-import org.jetbrains.ktor.application.call
 import org.jetbrains.ktor.http.HttpStatusCode
 import org.jetbrains.ktor.pipeline.PipelineContext
 import org.jetbrains.ktor.request.httpMethod
