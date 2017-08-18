@@ -21,7 +21,7 @@ class PrometheusFeature(configuration: Configuration) {
         var counter: Counter? = null
     }
 
-    suspend fun intercept(context: PipelineContext<ApplicationCall>){
+    suspend fun intercept(context: PipelineContext<Unit>){
         var timer: Summary.Timer? = null
         try {
             if(summary != null) { timer = summary.startTimer() }
