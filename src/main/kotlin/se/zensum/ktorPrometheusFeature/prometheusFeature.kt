@@ -19,20 +19,20 @@ class PrometheusFeature(configuration: Configuration) {
         var counter: Counter? = null
     }
 
-    suspend fun intercept(context: PipelineContext<Unit>){
+    suspend fun intercept(context: PipelineContext<Unit>) {
         var timer: Summary.Timer? = null
         try {
-            if(summary != null) { timer = summary.startTimer() }
+            if (summary != null) { timer = summary.startTimer() }
             context.proceed()
             context.finish()
         } catch (e: Exception) {
             context.call.response.status(HttpStatusCode.fromValue(500))
             throw e
         } finally {
-            if(timer != null){  summary!!.observe(timer.observeDuration()) }
-            if(counter != null) {
+            if (timer != null) { summary!!.observe(timer.observeDuration()) }
+            if (counter != null) {
                 val method = context.call.request.httpMethod.value
-                val responseCode = if(context.call.response.status() != null) context.call.response.status()!!.value.toString() else "404"
+                val responseCode = if (context.call.response.status() != null) context.call.response.status()!!.value.toString() else "404"
                 counter.labels(method, responseCode).inc()
             }
         }
