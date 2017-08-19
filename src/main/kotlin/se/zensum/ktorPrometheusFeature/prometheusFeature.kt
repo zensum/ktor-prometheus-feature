@@ -11,30 +11,37 @@ import org.jetbrains.ktor.util.AttributeKey
 
 class PrometheusFeature(configuration: Configuration) {
 
-    val summary = configuration.summary
-    val counter = configuration.counter
+    val summary = configuration.summaryOrDefault()
+    val counter = configuration.counterOrDefault()
 
     class Configuration {
+        internal fun summaryOrDefault() = summary ?: Summary.build()
+                .name("http_request_duration_seconds")
+                .help("Total response time")
+                .register()
+        internal fun counterOrDefault() = counter ?: Counter.build()
+                .name("http_request")
+                .labelNames("method", "response_code")
+                .help("total number of requests")
+                .register()
+
         var summary: Summary? = null
         var counter: Counter? = null
     }
 
     suspend fun intercept(context: PipelineContext<Unit>) {
-        var timer: Summary.Timer? = null
+        var timer = summary.startTimer()
         try {
-            if (summary != null) { timer = summary.startTimer() }
             context.proceed()
             context.finish()
         } catch (e: Exception) {
             context.call.response.status(HttpStatusCode.fromValue(500))
             throw e
         } finally {
-            if (timer != null) { summary!!.observe(timer.observeDuration()) }
-            if (counter != null) {
-                val method = context.call.request.httpMethod.value
-                val responseCode = if (context.call.response.status() != null) context.call.response.status()!!.value.toString() else "404"
-                counter.labels(method, responseCode).inc()
-            }
+            summary.observe(timer.observeDuration())
+            val method = context.call.request.httpMethod.value
+            val responseCode = if (context.call.response.status() != null) context.call.response.status()!!.value.toString() else "404"
+            counter.labels(method, responseCode).inc()
         }
     }
 
