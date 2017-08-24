@@ -1,5 +1,5 @@
 # ktor-promethues - Prometheus request logging for all requests
-[![license](https://img.shields.io/github/license/zensum/ktor-prometheus-feature.svg)]() [![](https://jitpack.io/v/zensum/ktor-prometheus-feature.svg)](https://jitpack.io/#zensum/ktor-promethues-feature)
+[![license](https://img.shields.io/github/license/zensum/ktor-prometheus-feature.svg)]() [![](https://jitpack.io/v/zensum/ktor-prometheus-feature.svg)](https://jitpack.io/#zensum/ktor-prometheus-feature)
 
 Ktor-prometheus adds support for request logging with prometheus in [ktor](https://ktor.io).
 
