@@ -3,13 +3,7 @@ jobs:
   build:
     working_directory: ~/ktor-prometheus-feature
     docker:
-      - image: gradle:3.5-jdk8
-        environment:
-          PROJECT_NAME: zens-main
-          CLUSTER_NAME: zens-kube
-          CLOUDSDK_COMPUTE_ZONE: europe-west1-d
-          DEBIAN_FRONTEND: noninteractive
-          HELM_INSTALL_DIR: /home/gradle/ktor-prometheus-feature
+      - image: gradle:4.0-jdk8
     steps:
       - checkout
       - restore_cache:
@@ -21,20 +15,3 @@ jobs:
           key: circleci-ktor-prometheus-feature-{{ checksum "build.gradle" }}
       - run: gradle build
       - run: gradle test
-      - deploy:
-          command: |
-            curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-159.0.0-linux-x86_64.tar.gz | tar xfz -
-            ./google-cloud-sdk/install.sh -q --additional-components kubectl
-      - deploy:
-          command: |
-            echo $ACCT_AUTH | base64 --decode -i > ${HOME}/account-auth.json ;
-            ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/account-auth.json ;
-            ./google-cloud-sdk/bin/gcloud config set project $PROJECT_NAME ;
-            ./google-cloud-sdk/bin/gcloud --quiet config set container/cluster $CLUSTER_NAME ;
-            ./google-cloud-sdk/bin/gcloud config set compute/zone ${CLOUDSDK_COMPUTE_ZONE} ;
-            ./google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials $CLUSTER_NAME ;
-            curl https://kubernetes-helm.storage.googleapis.com/helm-v2.4.2-linux-amd64.tar.gz | tar xfz -
-            mv linux-amd64/helm .
-            ./google-cloud-sdk/bin/gcloud container builds submit --tag "gcr.io/zens-main/ktor-prometheus-feature:$CIRCLE_SHA1" .
-            cd deploy/
-            ../helm upgrade ktor-prometheus-feature ktor-prometheus-feature --set image.tag=$CIRCLE_SHA1
