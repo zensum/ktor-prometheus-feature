@@ -47,7 +47,7 @@ class PrometheusFeature(configuration: Configuration) {
                     .getAll(METRIC_NAME_PARAM)
                     .orEmpty()
                     .toSet()
-            PrometheusResponder(metricNames = metricNames)
+            call.respond(PrometheusResponder(metricNames = metricNames))
             context.finish()
             return
         }
