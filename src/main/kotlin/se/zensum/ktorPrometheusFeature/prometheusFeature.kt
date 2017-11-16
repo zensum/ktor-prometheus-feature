@@ -7,6 +7,7 @@ import org.jetbrains.ktor.application.ApplicationFeature
 import org.jetbrains.ktor.pipeline.PipelineContext
 import org.jetbrains.ktor.request.httpMethod
 import org.jetbrains.ktor.request.path
+import org.jetbrains.ktor.response.respond
 import org.jetbrains.ktor.util.AttributeKey
 
 private const val DEFAULT_PATH = "/metrics"
@@ -47,7 +48,7 @@ class PrometheusFeature(configuration: Configuration) {
                     .getAll(METRIC_NAME_PARAM)
                     .orEmpty()
                     .toSet()
-            call.respond(PrometheusResponder(metricNames = metricNames))
+            context.call.respond(PrometheusResponder(metricNames = metricNames))//detta är riktigt dumt --Will, Nej det är det inte alls det --Will
             context.finish()
             return
         }
