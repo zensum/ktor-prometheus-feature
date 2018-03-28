@@ -1,14 +1,16 @@
 package se.zensum.ktorPrometheusFeature
 
+import io.ktor.application.ApplicationCall
+import io.ktor.application.ApplicationCallPipeline
+import io.ktor.application.ApplicationFeature
+import io.ktor.application.call
+import io.ktor.pipeline.PipelineContext
+import io.ktor.request.httpMethod
+import io.ktor.request.path
+import io.ktor.response.respond
+import io.ktor.util.AttributeKey
 import io.prometheus.client.Counter
 import io.prometheus.client.Summary
-import org.jetbrains.ktor.application.ApplicationCallPipeline
-import org.jetbrains.ktor.application.ApplicationFeature
-import org.jetbrains.ktor.pipeline.PipelineContext
-import org.jetbrains.ktor.request.httpMethod
-import org.jetbrains.ktor.request.path
-import org.jetbrains.ktor.response.respond
-import org.jetbrains.ktor.util.AttributeKey
 
 private const val DEFAULT_PATH = "/metrics"
 private const val METRIC_NAME_PARAM = "name[]"
@@ -42,7 +44,7 @@ class PrometheusFeature(configuration: Configuration) {
         counter.labels(method, statusCode ?: "200").inc()
     }
 
-    private suspend fun intercept(context: PipelineContext<Unit>) {
+    private suspend fun intercept(context: PipelineContext<Unit, ApplicationCall>) {
         if (exposeMetrics && context.call.request.path() == DEFAULT_PATH) {
             val metricNames = context.call.parameters
                     .getAll(METRIC_NAME_PARAM)
@@ -64,7 +66,8 @@ class PrometheusFeature(configuration: Configuration) {
         }
     }
 
-    companion object Feature : ApplicationFeature<ApplicationCallPipeline, Configuration, PrometheusFeature> {
+    companion object Feature : ApplicationFeature<ApplicationCallPipeline, Configuration, PrometheusFeature>
+    {
         override val key = AttributeKey<PrometheusFeature>("PrometheusFeature")
         override fun install(pipeline: ApplicationCallPipeline, configure: Configuration.() -> Unit): PrometheusFeature {
             val result = PrometheusFeature(Configuration().apply(configure))
