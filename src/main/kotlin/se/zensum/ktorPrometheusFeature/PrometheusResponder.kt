@@ -1,12 +1,12 @@
 package se.zensum.ktorPrometheusFeature
 
+import io.ktor.content.OutgoingContent
+import io.ktor.http.Headers
+import io.ktor.http.HttpStatusCode
 import io.prometheus.client.Collector
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
-import org.jetbrains.ktor.cio.WriteChannel
-import org.jetbrains.ktor.content.FinalContent
-import org.jetbrains.ktor.http.HttpStatusCode
-import org.jetbrains.ktor.util.ValuesMap
+import kotlinx.coroutines.experimental.io.ByteWriteChannel
 import java.io.CharArrayWriter
 import java.nio.CharBuffer
 import java.util.*
@@ -26,16 +26,16 @@ private fun metricsToStr(
 internal class PrometheusResponder(
         val registry: CollectorRegistry = CollectorRegistry.defaultRegistry,
         val metricNames: Set<String> = emptySet()
-) : FinalContent.WriteChannelContent() {
+) : OutgoingContent.WriteChannelContent() {
     override val status = HttpStatusCode.OK
-    override val headers: ValuesMap
-        get() = ValuesMap.build {
+    override val headers: Headers
+        get() = Headers.build {
             append("Content-Type", TextFormat.CONTENT_TYPE_004)
         }
 
-    suspend override fun writeTo(channel: WriteChannel) {
+    override suspend fun writeTo(channel: ByteWriteChannel) {
         val metrics = registry
                 .filteredMetricFamilySamples(metricNames)
-        channel.write(metricsToStr(metrics))
+        channel.writeFully(metricsToStr(metrics))
     }
 }
