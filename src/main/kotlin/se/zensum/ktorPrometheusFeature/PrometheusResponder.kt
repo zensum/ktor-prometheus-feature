@@ -28,10 +28,6 @@ internal class PrometheusResponder(
         val metricNames: Set<String> = emptySet()
 ) : OutgoingContent.WriteChannelContent() {
     override val status = HttpStatusCode.OK
-    override val headers: Headers
-        get() = Headers.build {
-            append("Content-Type", TextFormat.CONTENT_TYPE_004)
-        }
 
     override suspend fun writeTo(channel: ByteWriteChannel) {
         val metrics = registry
