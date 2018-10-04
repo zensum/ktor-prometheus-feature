@@ -10,7 +10,7 @@ description = 'description of project'
 defaultTasks 'build'
 
 buildscript {
-    ext.kotlin_version = '1.2.31'
+    ext.kotlin_version = '1.2.71'
     ext.jvm_version = '1.8'
     ext.junit_platform_version = '1.1.0'
     ext.ktor_version = '0.9.5'
