@@ -29,8 +29,8 @@ apply plugin: "org.junit.platform.gradle.plugin"
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-jdk8', version: '0.22.5'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.22.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.30.1'
 
     // TODO Most recent version seems to be 0.3.0, maybe we should update soon
     // https://github.com/prometheus/client_java/releases/latest
@@ -81,5 +81,5 @@ sourceSets {
 
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts for faster execution'
-    gradleVersion = '4.6'
+    gradleVersion = '4.9'
 }
