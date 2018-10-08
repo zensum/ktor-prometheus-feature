@@ -7,10 +7,12 @@ import io.ktor.application.call
 import io.ktor.pipeline.PipelineContext
 import io.ktor.request.httpMethod
 import io.ktor.request.path
-import io.ktor.response.respond
+import io.ktor.response.respondTextWriter
 import io.ktor.util.AttributeKey
+import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import io.prometheus.client.Summary
+import io.prometheus.client.exporter.common.TextFormat
 
 private const val DEFAULT_PATH = "/metrics"
 private const val METRIC_NAME_PARAM = "name[]"
@@ -45,12 +47,17 @@ class PrometheusFeature(configuration: Configuration) {
     }
 
     private suspend fun intercept(context: PipelineContext<Unit, ApplicationCall>) {
-        if (exposeMetrics && context.call.request.path() == DEFAULT_PATH) {
+
+        if (exposeMetrics && context.context.request.path() == DEFAULT_PATH) {
             val metricNames = context.call.parameters
                     .getAll(METRIC_NAME_PARAM)
                     .orEmpty()
                     .toSet()
-            context.call.respond(PrometheusResponder(metricNames = metricNames))//detta är riktigt dumt --Will, Nej det är det inte alls det --Will
+            val mfs = CollectorRegistry.defaultRegistry
+                    .filteredMetricFamilySamples(metricNames)
+            context.call.respondTextWriter {
+                TextFormat.write004(this, mfs)
+            }
             context.finish()
             return
         }
@@ -60,8 +67,8 @@ class PrometheusFeature(configuration: Configuration) {
             }
         } finally {
             countReq(
-                    context.call.request.httpMethod.value,
-                    context.call.response.status()?.value?.toString()
+                    context.context.request.httpMethod.value,
+                    context.context.response.status()?.value?.toString()
             )
         }
     }
