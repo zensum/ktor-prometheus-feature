@@ -12,16 +12,40 @@ import io.ktor.util.AttributeKey
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import io.prometheus.client.Summary
+import io.prometheus.client.exporter.HTTPServer
 import io.prometheus.client.exporter.common.TextFormat
 
 private const val DEFAULT_PATH = "/metrics"
 private const val METRIC_NAME_PARAM = "name[]"
+
+fun once(f: () -> Unit): () -> Unit {
+    var triggered = false
+    return {
+        if (!triggered) {
+            triggered = true
+            f()
+        }
+    }
+}
+
+private fun setupServerInternal() {
+    if (System.getenv("DISABLE_PROMETHEUS_SERVER") == "yes") {
+        return
+    }
+    HTTPServer(9090)
+}
+
+private val setupServer = once(::setupServerInternal)
 
 class PrometheusFeature(configuration: Configuration) {
 
     private val summary = configuration.summaryOrDefault()
     private val counter = configuration.counterOrDefault()
     private val exposeMetrics = configuration.hasMetricsEndpoint()
+    init {
+        setupServer.invoke()
+    }
+
 
     class Configuration {
         internal fun summaryOrDefault() = summary ?: Summary.build()
@@ -36,10 +60,12 @@ class PrometheusFeature(configuration: Configuration) {
 
         var summary: Summary? = null
         var counter: Counter? = null
+        internal var runServer: Boolean = true
 
         private var metricsEndpoint = true
         internal fun hasMetricsEndpoint() = metricsEndpoint
         fun disableMetricsEndpoint() { metricsEndpoint = false }
+        fun disableServer() { runServer = false }
     }
 
     private fun countReq(method: String, statusCode: String?) {
