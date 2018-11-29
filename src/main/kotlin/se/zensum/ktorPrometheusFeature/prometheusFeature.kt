@@ -99,8 +99,7 @@ class PrometheusFeature(configuration: Configuration) {
         }
     }
 
-    companion object Feature : ApplicationFeature<ApplicationCallPipeline, Configuration, PrometheusFeature>
-    {
+    companion object Feature : ApplicationFeature<ApplicationCallPipeline, Configuration, PrometheusFeature> {
         override val key = AttributeKey<PrometheusFeature>("PrometheusFeature")
         override fun install(pipeline: ApplicationCallPipeline, configure: Configuration.() -> Unit): PrometheusFeature {
             val result = PrometheusFeature(Configuration().apply(configure))
